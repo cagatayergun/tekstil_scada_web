@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/models/kpi_view_model.dart';
 import 'package:tekstil_scada_web/services/api_service.dart';
-import 'package:tekstil_scada_web/widgets/kpi_card.dart'; // Daha önceki adımda oluşturduğumuz widget.
+import 'package:tekstil_scada_web/widgets/kpi_card.dart';
+import 'package:tekstil_scada_web/widgets/main_drawer.dart'; // Bu satırı ekleyin.
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Genel Bakış')),
+      drawer: const MainDrawer(), // Bu satırı ekleyin.
       body: FutureBuilder<List<KpiViewModel>>(
         future: _kpiData,
         builder: (context, snapshot) {
@@ -34,12 +36,11 @@ class _DashboardPageState extends State<DashboardPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Veri bulunamadı.'));
           } else {
-            // Veri başarıyla yüklendi, KPI kartlarını göster.
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Her satırda 2 kart.
+                  crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   childAspectRatio: 1.5,
@@ -50,9 +51,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   return KpiCard(
                     title: kpi.title,
                     value: kpi.value,
-                    color: index % 2 == 0
-                        ? Colors.blue
-                        : Colors.green, // Örnek renkler.
+                    color: index % 2 == 0 ? Colors.blue : Colors.green,
                   );
                 },
               ),

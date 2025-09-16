@@ -33,19 +33,19 @@ class _RecipeStepDesignerPageState extends State<RecipeStepDesignerPage> {
   Widget _getStepEditorWidget(ScadaRecipeStep step) {
     switch (step.stepType.toLowerCase()) {
       case 'ısıtma':
-        return HeatingStepEditor(step: step);
+        return HeatingStepEditor(step: step, recipeId: widget.recipeId);
       case 'kurutma':
-        return DryingStepEditor(step: step);
+        return DryingStepEditor(step: step, recipeId: widget.recipeId);
       case 'su_alma':
-        return WaterIntakeStepEditor(step: step);
+        return WaterIntakeStepEditor(step: step, recipeId: widget.recipeId);
       case 'sıkma':
-        return SpinningStepEditor(step: step);
+        return SpinningStepEditor(step: step, recipeId: widget.recipeId);
       case 'dozaj':
-        return DosingStepEditor(step: step);
+        return DosingStepEditor(step: step, recipeId: widget.recipeId);
       case 'boşaltma':
-        return EmptyingStepEditor(step: step);
-      case 'çalışma': // Yeni eklenen adım tipi
-        return WorkingStepEditor(step: step);
+        return EmptyingStepEditor(step: step, recipeId: widget.recipeId);
+      case 'çalışma':
+        return WorkingStepEditor(step: step, recipeId: widget.recipeId);
       default:
         return Text('Bilinmeyen adım tipi: ${step.stepType}');
     }

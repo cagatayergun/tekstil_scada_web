@@ -6,6 +6,7 @@ import '../models/machine_status.dart';
 import '../models/full_machine_status.dart'; // Bu satırı ekleyin.
 import '../models/process_control_command.dart'; // Bu satırı ekleyin.
 import '../models/vnc_connection_info.dart'; // Bu satırı ekleyin.
+import '../models/machine.dart'; // Bu satırı ekleyin.
 
 class MachineService {
   final String _baseApiUrl = 'https://tekstilscada-api.com/api/Machine';
@@ -79,6 +80,21 @@ class MachineService {
       throw Exception(
         'VNC bağlantı bilgileri yüklenemedi: ${response.statusCode}',
       );
+    }
+  }
+
+  // Yeni eklenen metot: Tüm makinelerin listesini çeker.
+  Future<List<Machine>> getAllMachines() async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$_baseApiUrl/All'),
+      headers: headers,
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Machine.fromJson(json)).toList();
+    } else {
+      throw Exception('Makine listesi yüklenemedi: ${response.statusCode}');
     }
   }
 }

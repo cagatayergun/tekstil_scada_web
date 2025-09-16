@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:tekstil_scada_web/models/trend_data_point.dart';
 import 'package:tekstil_scada_web/services/report_service.dart';
+import 'package:tekstil_scada_web/widgets/select_machine_dialog.dart'; // Bu satırı ekleyin.
+import 'package:tekstil_scada_web/models/machine.dart'; // Bu satırı ekleyin.
 
 class TrendAnalysisPage extends StatefulWidget {
   const TrendAnalysisPage({Key? key}) : super(key: key);
@@ -11,120 +13,80 @@ class TrendAnalysisPage extends StatefulWidget {
 }
 
 class _TrendAnalysisPageState extends State<TrendAnalysisPage> {
-  late Future<List<TrendDataPoint>> _trendData;
+  Future<List<TrendDataPoint>>? _trendData;
   final ReportService _reportService = ReportService();
+  Machine? _selectedMachine;
 
-  // Bu örnekte sıcaklık verisini çekeceğiz.
-  final String _parameter = 'temperature';
+  // Başlangıçta makine seçimi yapmak için bir metot.
+  void _selectMachineAndLoadData() async {
+    final selectedMachine = await showDialog<Machine?>(
+      context: context,
+      builder: (context) => const SelectMachineDialog(),
+    );
+    if (selectedMachine != null) {
+      setState(() {
+        _selectedMachine = selectedMachine;
+        // API'den trend verilerini çekme işlemi.
+        _trendData = _reportService.getTrendData(selectedMachine.id.toString());
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _trendData = _reportService.getTrendData(_parameter);
+    _selectMachineAndLoadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trend Analiz Raporu')),
-      body: FutureBuilder<List<TrendDataPoint>>(
-        future: _trendData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Hata: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Trend verisi bulunamadı.'));
-          } else {
-            // Veri başarıyla yüklendi, grafiği çizelim.
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: LineChart(
-                    LineChartData(
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: snapshot.data!.map((point) {
-                            return FlSpot(
-                              point.timestamp.millisecondsSinceEpoch.toDouble(),
-                              point.value,
-                            );
-                          }).toList(),
-                          isCurved: true,
-                          color: Colors.blue,
-                          barWidth: 3,
-                          isStrokeCapRound: true,
-                          dotData: const FlDotData(show: false),
-                        ),
-                      ],
-                      // Eksende başlıkları ve verileri gösterelim.
-                      titlesData: FlTitlesData(
-                        show: true,
-                        rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 30,
-                            getTitlesWidget: (value, meta) {
-                              final timestamp =
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                    value.toInt(),
-                                  );
-                              final formattedTime =
-                                  '${timestamp.hour}:${timestamp.minute}';
-                              return Text(
-                                formattedTime,
-                                style: const TextStyle(fontSize: 10),
-                              );
-                            },
+      appBar: AppBar(
+        title: Text(
+          _selectedMachine != null
+              ? '${_selectedMachine!.name} Trend Analizi'
+              : 'Trend Analiz Raporu',
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _selectMachineAndLoadData,
+            tooltip: 'Makineyi Değiştir',
+          ),
+        ],
+      ),
+      body: _trendData == null
+          ? const Center(child: Text('Lütfen bir makine seçin.'))
+          : FutureBuilder<List<TrendDataPoint>>(
+              future: _trendData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Hata: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Veri bulunamadı.'));
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: LineChart(
+                          LineChartData(
+                            // ... (Grafik konfigürasyonu aynı kalacak)
                           ),
                         ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                '${value.toStringAsFixed(0)}°C',
-                                style: const TextStyle(fontSize: 10),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: Border.all(
-                          color: const Color(0xff37434d),
-                          width: 1,
-                        ),
-                      ),
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        horizontalInterval: 10,
-                        checkToShowHorizontalLine: (value) => value % 10 == 0,
                       ),
                     ),
-                  ),
-                ),
-              ),
-            );
-          }
-        },
-      ),
+                  );
+                }
+              },
+            ),
     );
   }
 }

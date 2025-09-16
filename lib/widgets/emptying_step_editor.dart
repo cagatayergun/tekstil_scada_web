@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/models/scada_recipe.dart';
+import 'package:tekstil_scada_web/services/recipe_service.dart';
 
 class EmptyingStepEditor extends StatefulWidget {
   final ScadaRecipeStep step;
+  final int recipeId;
 
-  const EmptyingStepEditor({Key? key, required this.step}) : super(key: key);
+  const EmptyingStepEditor({
+    Key? key,
+    required this.step,
+    required this.recipeId,
+  }) : super(key: key);
 
   @override
   _EmptyingStepEditorState createState() => _EmptyingStepEditorState();
@@ -13,6 +19,8 @@ class EmptyingStepEditor extends StatefulWidget {
 class _EmptyingStepEditorState extends State<EmptyingStepEditor> {
   late TextEditingController _durationController;
   late String _emptyingType;
+  final RecipeService _recipeService = RecipeService();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -29,6 +37,34 @@ class _EmptyingStepEditorState extends State<EmptyingStepEditor> {
     super.dispose();
   }
 
+  Future<void> _saveChanges() async {
+    setState(() {
+      _isSaving = true;
+    });
+    final updatedStep = ScadaRecipeStep(
+      stepId: widget.step.stepId,
+      stepType: widget.step.stepType,
+      parameters: {
+        'duration': int.tryParse(_durationController.text) ?? 0,
+        'type': _emptyingType,
+      },
+    );
+    try {
+      await _recipeService.updateRecipeStep(widget.recipeId, updatedStep);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Boşaltma adımı başarıyla güncellendi.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Hata: ${e.toString()}')));
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,7 +74,6 @@ class _EmptyingStepEditorState extends State<EmptyingStepEditor> {
           decoration: const InputDecoration(labelText: 'Süre (dakika)'),
           keyboardType: TextInputType.number,
         ),
-        // Boşaltma tipini seçmek için bir dropdown menüsü eklenebilir.
         DropdownButtonFormField<String>(
           value: _emptyingType,
           items: ['Tam', 'Kısmi'].map((String value) {
@@ -51,15 +86,12 @@ class _EmptyingStepEditorState extends State<EmptyingStepEditor> {
           },
           decoration: const InputDecoration(labelText: 'Boşaltma Tipi'),
         ),
-        ElevatedButton(
-          onPressed: () {
-            // API'ye kaydetme mantığı buraya gelecek.
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Boşaltma adımı kaydedildi.')),
-            );
-          },
-          child: const Text('Kaydet'),
-        ),
+        _isSaving
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: _saveChanges,
+                child: const Text('Kaydet'),
+              ),
       ],
     );
   }

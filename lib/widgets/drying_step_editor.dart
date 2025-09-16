@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/models/scada_recipe.dart';
+import 'package:tekstil_scada_web/services/recipe_service.dart';
 
 class DryingStepEditor extends StatefulWidget {
   final ScadaRecipeStep step;
+  final int recipeId;
 
-  const DryingStepEditor({Key? key, required this.step}) : super(key: key);
+  const DryingStepEditor({Key? key, required this.step, required this.recipeId})
+    : super(key: key);
 
   @override
   _DryingStepEditorState createState() => _DryingStepEditorState();
@@ -12,6 +15,8 @@ class DryingStepEditor extends StatefulWidget {
 
 class _DryingStepEditorState extends State<DryingStepEditor> {
   late TextEditingController _durationController;
+  final RecipeService _recipeService = RecipeService();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -27,6 +32,31 @@ class _DryingStepEditorState extends State<DryingStepEditor> {
     super.dispose();
   }
 
+  Future<void> _saveChanges() async {
+    setState(() {
+      _isSaving = true;
+    });
+    final updatedStep = ScadaRecipeStep(
+      stepId: widget.step.stepId,
+      stepType: widget.step.stepType,
+      parameters: {'duration': int.tryParse(_durationController.text) ?? 0},
+    );
+    try {
+      await _recipeService.updateRecipeStep(widget.recipeId, updatedStep);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kurutma adımı başarıyla güncellendi.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Hata: ${e.toString()}')));
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,15 +68,12 @@ class _DryingStepEditorState extends State<DryingStepEditor> {
           ),
           keyboardType: TextInputType.number,
         ),
-        // Değişiklikleri kaydetmek için buton
-        ElevatedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Değişiklikler kaydedildi.')),
-            );
-          },
-          child: const Text('Kaydet'),
-        ),
+        _isSaving
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: _saveChanges,
+                child: const Text('Kaydet'),
+              ),
       ],
     );
   }

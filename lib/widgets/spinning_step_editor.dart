@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/models/scada_recipe.dart';
+import 'package:tekstil_scada_web/services/recipe_service.dart';
 
 class SpinningStepEditor extends StatefulWidget {
   final ScadaRecipeStep step;
+  final int recipeId;
 
-  const SpinningStepEditor({Key? key, required this.step}) : super(key: key);
+  const SpinningStepEditor({
+    Key? key,
+    required this.step,
+    required this.recipeId,
+  }) : super(key: key);
 
   @override
   _SpinningStepEditorState createState() => _SpinningStepEditorState();
@@ -13,6 +19,8 @@ class SpinningStepEditor extends StatefulWidget {
 class _SpinningStepEditorState extends State<SpinningStepEditor> {
   late TextEditingController _durationController;
   late TextEditingController _speedController;
+  final RecipeService _recipeService = RecipeService();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -32,6 +40,34 @@ class _SpinningStepEditorState extends State<SpinningStepEditor> {
     super.dispose();
   }
 
+  Future<void> _saveChanges() async {
+    setState(() {
+      _isSaving = true;
+    });
+    final updatedStep = ScadaRecipeStep(
+      stepId: widget.step.stepId,
+      stepType: widget.step.stepType,
+      parameters: {
+        'duration': int.tryParse(_durationController.text) ?? 0,
+        'speed': int.tryParse(_speedController.text) ?? 0,
+      },
+    );
+    try {
+      await _recipeService.updateRecipeStep(widget.recipeId, updatedStep);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sıkma adımı başarıyla güncellendi.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Hata: ${e.toString()}')));
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -46,15 +82,12 @@ class _SpinningStepEditorState extends State<SpinningStepEditor> {
           decoration: const InputDecoration(labelText: 'Hız (RPM)'),
           keyboardType: TextInputType.number,
         ),
-        ElevatedButton(
-          onPressed: () {
-            // API'ye kaydetme mantığı buraya gelecek.
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Sıkma adımı kaydedildi.')),
-            );
-          },
-          child: const Text('Kaydet'),
-        ),
+        _isSaving
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: _saveChanges,
+                child: const Text('Kaydet'),
+              ),
       ],
     );
   }

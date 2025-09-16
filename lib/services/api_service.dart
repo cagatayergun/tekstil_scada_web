@@ -5,7 +5,7 @@ import '../models/kpi_view_model.dart';
 
 class ApiService {
   final String _baseApiUrl =
-      'https://tekstilscada-api.com/api'; // API URL'inizi güncelleyin.
+      'http://localhost:7039'; // API URL'inizi güncelleyin.
 
   // API'den token alarak yetkilendirilmiş istek gönderme.
   Future<Map<String, String>> _getHeaders() async {

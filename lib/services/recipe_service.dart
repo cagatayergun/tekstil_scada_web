@@ -47,4 +47,23 @@ class RecipeService {
       throw Exception('Reçete yüklenemedi: ${response.statusCode}');
     }
   }
+
+  Future<void> updateRecipeStep(
+    int recipeId,
+    ScadaRecipeStep updatedStep,
+  ) async {
+    final headers = await _getHeaders();
+    final response = await http.put(
+      Uri.parse('$_baseApiUrl/$recipeId/Step/${updatedStep.stepId}'),
+      headers: headers,
+      body: jsonEncode({
+        'stepType': updatedStep.stepType,
+        'parameters': updatedStep.parameters,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Reçete adımı güncellenemedi: ${response.statusCode}');
+    }
+  }
 }
