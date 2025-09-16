@@ -1,7 +1,9 @@
+// lib/pages/process_monitoring_page.dart dosyasını güncelleyin.
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/models/machine_status.dart';
 import 'package:tekstil_scada_web/services/machine_service.dart';
 import 'package:tekstil_scada_web/widgets/machine_status_card.dart';
+import 'machine_detail_page.dart'; // Bu satırı ekleyin.
 
 class ProcessMonitoringPage extends StatefulWidget {
   const ProcessMonitoringPage({Key? key}) : super(key: key);
@@ -37,7 +39,7 @@ class _ProcessMonitoringPageState extends State<ProcessMonitoringPage> {
             return GridView.builder(
               padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Her satırda 2 kart.
+                crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 childAspectRatio: 0.8,
@@ -45,7 +47,18 @@ class _ProcessMonitoringPageState extends State<ProcessMonitoringPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final machine = snapshot.data![index];
-                return MachineStatusCard(machineStatus: machine);
+                return GestureDetector(
+                  // Tıklama özelliği ekler.
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MachineDetailPage(machineId: machine.id),
+                      ),
+                    );
+                  },
+                  child: MachineStatusCard(machineStatus: machine),
+                );
               },
             );
           }

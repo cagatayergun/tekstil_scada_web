@@ -1,5 +1,12 @@
+// lib/pages/reports_page.dart dosyasını güncelleyin.
 import 'package:flutter/material.dart';
-import 'alarm_report_page.dart'; // Bir sonraki adımda oluşturacağız.
+import 'alarm_report_page.dart';
+import 'trend_analysis_page.dart';
+import 'oee_report_page.dart';
+import 'production_report_page.dart';
+import 'action_log_report_page.dart';
+import 'manual_usage_report_page.dart';
+import 'recipe_optimization_page.dart'; // Bu satırı ekleyin.
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({Key? key}) : super(key: key);
@@ -10,7 +17,6 @@ class ReportsPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Raporlar')),
       body: ListView(
         children: [
-          // Alarm Raporu sayfası için bir liste elemanı.
           ListTile(
             leading: const Icon(Icons.warning, color: Colors.orange),
             title: const Text('Alarm Raporu'),
@@ -24,17 +30,83 @@ class ReportsPage extends StatelessWidget {
             },
           ),
           const Divider(),
-
-          // Buraya diğer rapor türleri için Listeleme elemanları eklenebilir.
-          // ListTile(
-          //   leading: const Icon(Icons.trending_up, color: Colors.green),
-          //   title: const Text('Trend Analiz Raporu'),
-          //   trailing: const Icon(Icons.chevron_right),
-          //   onTap: () {
-          //     // Trend Analiz Sayfasına yönlendirme yapılacak.
-          //   },
-          // ),
-          // const Divider(),
+          ListTile(
+            leading: const Icon(Icons.trending_up, color: Colors.green),
+            title: const Text('Trend Analiz Raporu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const TrendAnalysisPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.insights, color: Colors.blue),
+            title: const Text('OEE Raporu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const OeeReportPage()),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.factory, color: Colors.purple),
+            title: const Text('Üretim Raporu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ProductionReportPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.history, color: Colors.brown),
+            title: const Text('Eylem Kaydı Raporu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ActionLogReportPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.handyman, color: Colors.brown),
+            title: const Text('Manuel Kullanım Raporu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ManualUsageReportPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.psychology, color: Colors.indigo),
+            title: const Text('Reçete Optimizasyonu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const RecipeOptimizationPage(), // Bu satırı güncelleyin.
+                ),
+              );
+            },
+          ),
+          const Divider(),
         ],
       ),
     );

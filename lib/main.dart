@@ -1,4 +1,4 @@
-// main.dart dosyasının bir parçası
+// lib/main.dart dosyasını güncelleyin.
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/pages/login_page.dart';
 
@@ -13,8 +13,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TekstilSCADA',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginPage(), // Uygulama başladığında bu sayfa gösterilir.
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        // Diğer tema ayarları
+      ),
+      home: const LoginPage(),
+      // Uygulama genelinde kullanılacak diğer rotalar
+      // routes: {
+      //   '/dashboard': (context) => const DashboardPage(),
+      //   '/recipes': (context) => const RecipeSettingsPage(),
+      // },
     );
   }
 }
