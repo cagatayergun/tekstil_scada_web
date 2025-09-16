@@ -6,7 +6,8 @@ import 'oee_report_page.dart';
 import 'production_report_page.dart';
 import 'action_log_report_page.dart';
 import 'manual_usage_report_page.dart';
-import 'recipe_optimization_page.dart'; // Bu satırı ekleyin.
+import 'recipe_optimization_page.dart';
+import 'production_detail_page.dart'; // Bu satırı ekleyin.
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({Key? key}) : super(key: key);
@@ -68,6 +69,23 @@ class ReportsPage extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
+            leading: const Icon(
+              Icons.list_alt,
+              color: Colors.deepPurple,
+            ), // Yeni eklenen
+            title: const Text('Üretim Detayları'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const ProductionDetailPage(), // Bu satırı güncelleyin.
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
             leading: const Icon(Icons.history, color: Colors.brown),
             title: const Text('Eylem Kaydı Raporu'),
             trailing: const Icon(Icons.chevron_right),
@@ -100,8 +118,7 @@ class ReportsPage extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const RecipeOptimizationPage(), // Bu satırı güncelleyin.
+                  builder: (context) => const RecipeOptimizationPage(),
                 ),
               );
             },

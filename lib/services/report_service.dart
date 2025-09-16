@@ -9,6 +9,7 @@ import '../models/production_report_item.dart'; // Bu satırı ekleyin.
 import '../models/action_log_entry.dart'; // Bu satırı ekleyin.
 import '../models/manual_usage_report_item.dart'; // Bu satırı ekleyin.
 import '../models/recipe_optimization_data.dart'; // Bu satırı ekleyin.
+import '../models/production_detail.dart'; // Bu satırı ekleyin.
 
 class ReportService {
   final String _baseApiUrl = 'https://tekstilscada-api.com/api';
@@ -138,6 +139,24 @@ class ReportService {
     } else {
       throw Exception(
         'Reçete optimizasyon verileri yüklenemedi: ${response.statusCode}',
+      );
+    }
+  }
+
+  // Yeni eklenen metot
+  Future<List<ProductionDetail>> getProductionDetailReport() async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$_baseApiUrl/Report/GetProductionDetailReport'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => ProductionDetail.fromJson(json)).toList();
+    } else {
+      throw Exception(
+        'Üretim detay verileri yüklenemedi: ${response.statusCode}',
       );
     }
   }

@@ -4,7 +4,8 @@ import 'user_settings_page.dart';
 import 'machine_settings_page.dart';
 import 'cost_settings_page.dart';
 import 'alarm_settings_page.dart';
-import 'plc_operator_settings_page.dart'; // Bu satırı ekleyin.
+import 'plc_operator_settings_page.dart';
+import 'ftp_sync_page.dart'; // Bu satırı ekleyin.
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -77,8 +78,21 @@ class SettingsPage extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
+                  builder: (context) => const PlcOperatorSettingsPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.cloud_sync, color: Colors.purple),
+            title: const Text('FTP Senkronizasyonu'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
                   builder: (context) =>
-                      const PlcOperatorSettingsPage(), // Bu satırı güncelleyin.
+                      const FtpSyncPage(), // Bu satırı güncelleyin.
                 ),
               );
             },

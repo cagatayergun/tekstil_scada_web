@@ -3,6 +3,7 @@ import 'package:tekstil_scada_web/models/full_machine_status.dart';
 import 'package:tekstil_scada_web/services/machine_service.dart';
 import 'package:tekstil_scada_web/pages/process_control_page.dart';
 import 'package:tekstil_scada_web/widgets/water_tank_gauge.dart'; // Bu satırı ekleyin.
+import 'vnc_viewer_page.dart'; // Bu satırı ekleyin.
 
 class MachineDetailPage extends StatefulWidget {
   final int machineId;
@@ -53,6 +54,29 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
                   });
             },
             tooltip: 'Proses Kontrol',
+          ),
+          IconButton(
+            icon: const Icon(Icons.videocam),
+            onPressed: () {
+              _machineService
+                  .getVncConnectionInfo(widget.machineId)
+                  .then((connectionInfo) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            VncViewerPage(connectionInfo: connectionInfo),
+                      ),
+                    );
+                  })
+                  .catchError((e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('VNC bağlantı bilgileri yüklenemedi.'),
+                      ),
+                    );
+                  });
+            },
+            tooltip: 'VNC Görüntüleyici',
           ),
         ],
       ),

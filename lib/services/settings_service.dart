@@ -5,6 +5,7 @@ import '../models/machine_settings.dart';
 import '../models/cost_parameter.dart'; // Bu satırın ekli olduğundan emin olun.
 import 'package:tekstil_scada_web/models/alarm_definition.dart';
 import '../models/plc_operator.dart'; // Bu satırı ekleyin.
+import '../models/ftp_settings.dart'; // Bu satırı ekleyin.
 
 class SettingsService {
   final String _baseApiUrl = 'https://tekstilscada-api.com/api';
@@ -82,6 +83,50 @@ class SettingsService {
     } else {
       throw Exception(
         'PLC operatör verileri yüklenemedi: ${response.statusCode}',
+      );
+    }
+  }
+
+  // Yeni eklenen metot
+  Future<FtpSettings> getFtpSettings() async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$_baseApiUrl/Settings/GetFtpSettings'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return FtpSettings.fromJson(data);
+    } else {
+      throw Exception('FTP ayarları yüklenemedi: ${response.statusCode}');
+    }
+  }
+
+  // Yeni eklenen metot
+  Future<void> updateFtpSettings(FtpSettings settings) async {
+    final headers = await _getHeaders();
+    final response = await http.put(
+      Uri.parse('$_baseApiUrl/Settings/UpdateFtpSettings'),
+      headers: headers,
+      body: jsonEncode(settings.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('FTP ayarları güncellenemedi: ${response.statusCode}');
+    }
+  }
+
+  // FTP senkronizasyon işlemini başlatan metod.
+  Future<void> startFtpSync() async {
+    final headers = await _getHeaders();
+    final response = await http.post(
+      Uri.parse('$_baseApiUrl/Settings/StartFtpSync'),
+      headers: headers,
+    );
+    if (response.statusCode != 200) {
+      throw Exception(
+        'FTP senkronizasyonu başlatılamadı: ${response.statusCode}',
       );
     }
   }

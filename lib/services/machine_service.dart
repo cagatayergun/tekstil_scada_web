@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/machine_status.dart';
 import '../models/full_machine_status.dart'; // Bu satırı ekleyin.
 import '../models/process_control_command.dart'; // Bu satırı ekleyin.
+import '../models/vnc_connection_info.dart'; // Bu satırı ekleyin.
 
 class MachineService {
   final String _baseApiUrl = 'https://tekstilscada-api.com/api/Machine';
@@ -60,6 +61,24 @@ class MachineService {
 
     if (response.statusCode != 200) {
       throw Exception('Komut gönderilemedi: ${response.statusCode}');
+    }
+  }
+
+  // Yeni eklenen metot
+  Future<VncConnectionInfo> getVncConnectionInfo(int machineId) async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$_baseApiUrl/$machineId/VncConnection'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return VncConnectionInfo.fromJson(data);
+    } else {
+      throw Exception(
+        'VNC bağlantı bilgileri yüklenemedi: ${response.statusCode}',
+      );
     }
   }
 }

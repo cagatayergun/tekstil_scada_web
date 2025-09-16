@@ -1,8 +1,11 @@
 // lib/main.dart dosyasını güncelleyin.
 import 'package:flutter/material.dart';
 import 'package:tekstil_scada_web/pages/login_page.dart';
+import 'package:tekstil_scada_web/services/realtime_service.dart';
 
 void main() {
+  final realtimeService = RealtimeService();
+  realtimeService.startConnection();
   runApp(const MyApp());
 }
 
